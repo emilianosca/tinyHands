@@ -226,13 +226,12 @@
         console.log("Últimos 3 gestos:", lastGestures);
 
         if (JSON.stringify(lastGestures) === JSON.stringify(['Thumb_Up', 'Closed_Fist', 'Thumb_Down'])) {
-          alert("CORRECTO");
           window.location.href = "graciasManitas.html";
         } else {
           showEmoticon(gesture);
           failGestures++;
           if (failGestures == 10) {
-            alert("CAGASTE WUEY");
+            window.location.href = "perdonManitas.html";
             failGestures = 0;
           }
         }
