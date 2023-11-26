@@ -1,0 +1,52 @@
+
+    <section id="guardian" class="bg-gray-100">
+      <div
+        class="items-center w-full px-8 py-24 mx-auto md:px-12 lg:px-16 max-w-7xl"
+      >
+        <h2 class="text-3xl font-medium tracking-tight text-black sm:text-4xl">
+          aqui pones el qr abajo
+        </h2>
+        <p class="mt-2 text-sm text-gray-800">Aqui pones un texto guapo</p>
+
+        <div id="popup-timer" class="popup">
+          <div class="modal-content">
+            <h1>Lo siento pero se te ha terminado el tiempo</h1>
+            <a href="http://localhost:3000/">
+              <button id="close-popup-timer">Cerrar Sesión</button>
+            </a>
+          </div>
+        </div>
+
+        <div>
+          <p>
+            00:
+            <span id="countdown">45</span>
+            aqui un contenido mundano
+          </p>
+        </div>
+
+        <div class="h-screen w-full align-top justify-start">
+          <button id="startbutton">Comienza a inspeccionar</button>
+
+          <!-- aqui contenido perturbante -->
+          <div class="container">
+            <div class="content-area">
+              <div class="camera">
+                <video id="video">Video stream not available.</video>
+              </div>
+
+              <canvas id="reflay" class="overlay">
+                <div class="output">
+                  <img
+                    id="photo"
+                    alt="The screen capture will appear in this box."
+                  /></div
+              ></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section> 
+
+
+    
