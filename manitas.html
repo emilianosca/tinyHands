@@ -2,239 +2,243 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <title>Manitas</title>
+  <meta charset="UTF-8">
+  <title>Manitas</title>
 
-    <style>
-        body {
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f0f0f0;
-        }
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f0f0f0;
+    }
 
-        #liveView {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            cursor: pointer;
-            text-align: center;
-        }
+    #liveView {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      cursor: pointer;
+      text-align: center;
+      width: 960px;
+      /* Nueva anchura (el doble de 480px) */
+      height: 720px;
+      /* Nueva altura (el doble de 360px) */
+    }
 
-        .bigBlackButton {
-            background-color: #000;
-            color: #fff;
-            font-size: 1.5em;
-            padding: 15px 30px;
-            border: none;
-            cursor: pointer;
-        }
+    .bigBlackButton {
+      background-color: #000;
+      color: #fff;
+      font-size: 1.5em;
+      padding: 15px 30px;
+      border: none;
+      cursor: pointer;
+    }
 
-        .bigBlackButton:hover {
-            background-color: #333;
-        }
+    .bigBlackButton:hover {
+      background-color: #333;
+    }
 
-        #loadingMessage {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: rgba(255, 255, 255, 0.8);
-            padding: 20px;
-            border-radius: 10px;
-            display: none;
-        }
+    #loadingMessage {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: rgba(255, 255, 255, 0.8);
+      padding: 20px;
+      border-radius: 10px;
+      display: none;
+    }
 
-        #liveView video {
-            width: 100%;
-            height: auto;
-        }
+    #liveView video {
+      width: 100%;
+      height: auto;
+    }
 
-        #emoticon {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 6em;
-            display: none;
-        }
-    </style>
+    #emoticon {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 20em;
+      display: none;
+    }
+  </style>
 
-    <script>
-        window.console = window.console || function (t) { };
-    </script>
+  <script>
+    window.console = window.console || function (t) { };
+  </script>
 </head>
 
 <body>
-    <div id="liveView" class="videoView">
-        <button id="webcamButton" class="mdc-button mdc-button--raised bigBlackButton">
-            <span class="mdc-button__ripple"></span>
-            <span class="mdc-button__label">ENABLE WEBCAM</span>
-        </button>
-        <div id="loadingMessage">
-            Loading...
-        </div>
-        <div style="position: relative;">
-            <video id="webcam" autoplay playsinline></video>
-        </div>
+  <div id="liveView" class="videoView">
+    <button id="webcamButton" class="mdc-button mdc-button--raised bigBlackButton">
+      <span class="mdc-button__ripple"></span>
+      <span class="mdc-button__label">ENABLE WEBCAM</span>
+    </button>
+    <div id="loadingMessage">
+      Loading...
     </div>
+    <div style="position: relative;">
+      <video id="webcam" autoplay playsinline></video>
+    </div>
+  </div>
 
-    <div id="emoticon"></div>
+  <div id="emoticon"></div>
 
-    <script id="rendered-js" type="module">
-        import { GestureRecognizer, FilesetResolver, DrawingUtils } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3";
+  <script id="rendered-js" type="module">
+    import { GestureRecognizer, FilesetResolver, DrawingUtils } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3";
 
-        let gestureRecognizer;
-        let runningMode = "VIDEO";
-        let enableWebcamButton;
-        let webcamRunning = false;
-        const videoHeight = "360px";
-        const videoWidth = "480px";
-        let lastGestures = [];
-        let failGestures = 0;
+    let gestureRecognizer;
+    let runningMode = "VIDEO";
+    let enableWebcamButton;
+    let webcamRunning = false;
+    const videoHeight = "360px";
+    const videoWidth = "480px";
+    let lastGestures = [];
+    let failGestures = 0;
 
-        const createGestureRecognizer = async () => {
-            const vision = await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm");
-            gestureRecognizer = await GestureRecognizer.createFromOptions(vision, {
-                baseOptions: {
-                    modelAssetPath: "https://storage.googleapis.com/mediapipe-models/gesture_recognizer/gesture_recognizer/float16/1/gesture_recognizer.task",
-                    delegate: "GPU"
-                },
-                runningMode: runningMode
-            });
-        };
+    const createGestureRecognizer = async () => {
+      const vision = await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm");
+      gestureRecognizer = await GestureRecognizer.createFromOptions(vision, {
+        baseOptions: {
+          modelAssetPath: "https://storage.googleapis.com/mediapipe-models/gesture_recognizer/gesture_recognizer/float16/1/gesture_recognizer.task",
+          delegate: "GPU"
+        },
+        runningMode: runningMode
+      });
+    };
 
-        createGestureRecognizer();
+    createGestureRecognizer();
 
-        const video = document.getElementById("webcam");
-        const loadingMessage = document.getElementById("loadingMessage");
+    const video = document.getElementById("webcam");
+    const loadingMessage = document.getElementById("loadingMessage");
 
-        function hasGetUserMedia() {
-            return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+    function hasGetUserMedia() {
+      return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+    }
+
+    if (hasGetUserMedia()) {
+      enableWebcamButton = document.getElementById("webcamButton");
+      enableWebcamButton.addEventListener("click", enableCam);
+    } else {
+      console.warn("getUserMedia() is not supported by your browser");
+    }
+
+    async function enableCam(event) {
+      if (!gestureRecognizer) {
+        alert("Please wait for gestureRecognizer to load");
+        return;
+      }
+
+      // Show loading message
+      loadingMessage.style.display = 'block';
+
+      webcamRunning = true;
+      enableWebcamButton.style.display = 'none';
+
+      const constraints = {
+        video: true
+      };
+
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        video.srcObject = stream;
+        video.addEventListener("loadeddata", function () {
+          // Hide loading message
+          loadingMessage.style.display = 'none';
+
+          // Continue with prediction
+          predictWebcam();
+        });
+      } catch (error) {
+        console.error("Error accessing webcam:", error);
+      }
+    }
+
+    let lastVideoTime = -1;
+
+    async function predictWebcam() {
+      const webcamElement = document.getElementById("webcam");
+
+      if (runningMode === "IMAGE") {
+        runningMode = "VIDEO";
+        await gestureRecognizer.setOptions({ runningMode: "VIDEO" });
+      }
+
+      let nowInMs = Date.now();
+
+      if (video.currentTime !== lastVideoTime) {
+        lastVideoTime = video.currentTime;
+        const results = gestureRecognizer.recognizeForVideo(video, nowInMs);
+
+        if (results.gestures.length > 0) {
+          const detectedGesture = results.gestures[0][0].categoryName;
+          addLastGesture(detectedGesture);
+        }
+      }
+
+      if (webcamRunning === true) {
+        window.requestAnimationFrame(predictWebcam);
+      }
+    }
+
+    function showEmoticon(gesture) {
+      const emoticon = document.getElementById("emoticon");
+      emoticon.innerText = getEmoticonForGesture(gesture);
+      emoticon.style.display = "block";
+      setTimeout(() => {
+        emoticon.style.display = "none";
+      }, 500);
+    }
+
+    function getEmoticonForGesture(gesture) {
+      switch (gesture) {
+        case "Thumb_Up":
+          return "👍";
+        case "Closed_Fist":
+          return "✊";
+        case "Thumb_Down":
+          return "👎";
+        case "Open_Palm":
+          return "👋";
+        case "Pointing_Up":
+          return "☝️";
+        case "Victory":
+          return "✌️";
+        case "ILoveYou":
+          return "🤟";
+        default:
+          return "❓";
+      }
+    }
+
+    function addLastGesture(gesture) {
+      if (gesture != lastGestures[2] && gesture != "None") {
+        lastGestures.push(gesture);
+
+        if (lastGestures.length > 3) {
+          lastGestures.shift();
         }
 
-        if (hasGetUserMedia()) {
-            enableWebcamButton = document.getElementById("webcamButton");
-            enableWebcamButton.addEventListener("click", enableCam);
+        console.log("Últimos 3 gestos:", lastGestures);
+
+        if (JSON.stringify(lastGestures) === JSON.stringify(['Thumb_Up', 'Closed_Fist', 'Thumb_Down'])) {
+          alert("CORRECTO");
+          window.location.href = "graciasManitas.html";
         } else {
-            console.warn("getUserMedia() is not supported by your browser");
+          showEmoticon(gesture);
+          failGestures++;
+          if (failGestures == 10) {
+            alert("CAGASTE WUEY");
+            failGestures = 0;
+          }
         }
-
-        async function enableCam(event) {
-            if (!gestureRecognizer) {
-                alert("Please wait for gestureRecognizer to load");
-                return;
-            }
-
-            // Show loading message
-            loadingMessage.style.display = 'block';
-
-            webcamRunning = true;
-            enableWebcamButton.style.display = 'none';
-
-            const constraints = {
-                video: true
-            };
-
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia(constraints);
-                video.srcObject = stream;
-                video.addEventListener("loadeddata", function () {
-                    // Hide loading message
-                    loadingMessage.style.display = 'none';
-
-                    // Continue with prediction
-                    predictWebcam();
-                });
-            } catch (error) {
-                console.error("Error accessing webcam:", error);
-            }
-        }
-
-        let lastVideoTime = -1;
-
-        async function predictWebcam() {
-            const webcamElement = document.getElementById("webcam");
-
-            if (runningMode === "IMAGE") {
-                runningMode = "VIDEO";
-                await gestureRecognizer.setOptions({ runningMode: "VIDEO" });
-            }
-
-            let nowInMs = Date.now();
-
-            if (video.currentTime !== lastVideoTime) {
-                lastVideoTime = video.currentTime;
-                const results = gestureRecognizer.recognizeForVideo(video, nowInMs);
-
-                if (results.gestures.length > 0) {
-                    const detectedGesture = results.gestures[0][0].categoryName;
-                    addLastGesture(detectedGesture);
-                }
-            }
-
-            if (webcamRunning === true) {
-                window.requestAnimationFrame(predictWebcam);
-            }
-        }
-
-        function showEmoticon(gesture) {
-            const emoticon = document.getElementById("emoticon");
-            emoticon.innerText = getEmoticonForGesture(gesture);
-            emoticon.style.display = "block";
-            setTimeout(() => {
-                emoticon.style.display = "none";
-            }, 500);
-        }
-
-        function getEmoticonForGesture(gesture) {
-            switch (gesture) {
-                case "Thumb_Up":
-                    return "👍";
-                case "Closed_Fist":
-                    return "✊";
-                case "Thumb_Down":
-                    return "👎";
-                case "Open_Palm":
-                    return "👋";
-                case "Pointing_Up":
-                    return "☝️";
-                case "Victory":
-                    return "✌️";
-                case "ILoveYou":
-                    return "🤟";
-                default:
-                    return "❓";
-            }
-        }
-
-        function addLastGesture(gesture) {
-            if (gesture != lastGestures[2] && gesture != "None") {
-                lastGestures.push(gesture);
-
-                if (lastGestures.length > 3) {
-                    lastGestures.shift();
-                }
-
-                console.log("Últimos 3 gestos:", lastGestures);
-
-                if (JSON.stringify(lastGestures) === JSON.stringify(['Thumb_Up', 'Closed_Fist', 'Thumb_Down'])) {
-                    alert("CORRECTO");
-                    window.location.href = "graciasManitas.html";
-                } else {
-                    showEmoticon(gesture);
-                    failGestures++;
-                    if (failGestures == 10) {
-                        alert("CAGASTE WUEY");
-                        failGestures = 0;
-                    }
-                }
-            }
-        }
-    </script>
+      }
+    }
+  </script>
 </body>
 
 </html>
