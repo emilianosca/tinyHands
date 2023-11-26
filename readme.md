@@ -3,7 +3,7 @@
 ```bash
 (also seen in init.sh)
 
-```bash
+```
 npm install
 npm run start
 ```
