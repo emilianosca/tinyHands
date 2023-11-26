@@ -225,7 +225,7 @@
 
         console.log("Últimos 3 gestos:", lastGestures);
 
-        if (JSON.stringify(lastGestures) === JSON.stringify(['Thumb_Up', 'Closed_Fist', 'Thumb_Down'])) {
+        if (JSON.stringify(lastGestures) === JSON.stringify(['Thumb_Down', 'Closed_Fist', 'Thumb_Up'])) {
           window.location.href = "graciasManitas.html";
         } else {
           showEmoticon(gesture);
